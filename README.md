@@ -7,7 +7,7 @@ Quiz app with React Native, Node, Express and MySQL
 2.2 Open terminal and type in `npm install` to install required npm packages.  
 2.3 Enter the command `npm start` to run the project.  
 
-3.1 cd into `server`
+3.1 cd into `server`  
 3.2 Open terminal and type in `npm install` to install required npm packages.  
 3.3 Enter the command `nodemon` to start the project with auto reload.  
 
