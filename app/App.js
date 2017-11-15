@@ -1,0 +1,47 @@
+import React from 'react';
+import { StyleSheet, Text, View, Animated, Easing } from 'react-native';
+import { StackNavigator } from 'react-navigation';
+import Home from './src/components/Home.js';
+import Otp from './src/components/otp.js';
+import Playnow from './src/components/playLoading.js';
+import Play from './src/components/play.js';
+import Result from './src/components/result.js';
+
+const AppNavigator = StackNavigator({
+  Home: { screen: Home},
+  Otp: { screen: Otp },
+  PlayLoading: { screen: Playnow },
+  Play: { screen: Play},
+  Result: { screen: Result }
+},{
+  initialRouteName: "Home",
+  headerMode: "none",
+  navigationOptions: {
+     gesturesEnabled: false,
+   },
+   transitionConfig: () => ({
+     transitionSpec: {
+       duration: 1,
+       timing: Animated.timing,
+     }
+   })
+});
+
+export default class App extends React.Component {
+
+
+
+  render() {
+    return  <AppNavigator /> ;
+  }
+
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+});
