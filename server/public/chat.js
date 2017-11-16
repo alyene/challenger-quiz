@@ -22,3 +22,9 @@ socket.on('gamecreatedpleasewait', function(){
 button.addEventListener('click', function() {
     socket.emit('firstQuestion', { answer:1, score:16 });
 });
+
+socket.emit('submitanswer', { score: 20, status: false });
+
+socket.on('opponentanswered', function(data){
+    console.log(data);
+});

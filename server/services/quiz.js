@@ -8,6 +8,10 @@ module.exports = function(app, pool, server) {
 
     websocket.on('connection', (socket) => {
 
+        socket.on('submitanswer', function(data){
+            socket.broadcast.emit('opponentanswered', { score: 20, status: false });
+        });
+
         console.log(socket.adapter.rooms);
 
         //Connection establised. Get data now
