@@ -1,6 +1,10 @@
 import React from 'react';
 import { StyleSheet, Text, View, Animated, Easing } from 'react-native';
 import { StackNavigator } from 'react-navigation';
+import { Provider } from 'react-redux';
+import { createStore } from 'redux';
+import reducers from './src/reducers';
+
 import Home from './src/components/Home.js';
 import Otp from './src/components/otp.js';
 import Playnow from './src/components/playLoading.js';
@@ -28,11 +32,12 @@ const AppNavigator = StackNavigator({
 });
 
 export default class App extends React.Component {
-
-
-
   render() {
-    return  <AppNavigator /> ;
+    return  (
+      <Provider store={createStore(reducers)}>
+        <AppNavigator />
+      </Provider>
+    );
   }
 
 }

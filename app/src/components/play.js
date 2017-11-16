@@ -1,21 +1,20 @@
 import React from 'react';
 import { Text, View, StyleSheet, TouchableHighlight } from 'react-native';
 import { Header, Button, Spinner } from './common';
+import { connect } from 'react-redux';
+import * as actions from '../actions/';
+
 import { Otp } from './otp.js';
 import axios from 'axios';
 
 import SocketIOClient from 'socket.io-client';
 
-export default class Play extends React.Component {
+class Play extends React.Component {
 
     socket;
 
     constructor(props) {
       super(props);
-      this.state = {
-        currentQuestionIndex: 0,
-        questions: []
-      };
       this.socket = SocketIOClient('http://192.168.225.37:8000');
 
     }
@@ -31,20 +30,17 @@ export default class Play extends React.Component {
 
     clickedOption() {
       const { navigate } = this.props.navigation;
-
-      console.log('question index: ', this.state.currentQuestionIndex)
-      const newIndex =  this.state.currentQuestionIndex + 1;
-      if( newIndex > 3) {
+      console.log('current index: ',this.props.questionIndex );
+      if( this.props.questionIndex  > 0) {
         console.log('Game Finished, time to navigate.');
         navigate('Result');
+      }else {
+          this.props.question_index(this.props.questionIndex + 1);
       }
-      this.setState({
-        currentQuestionIndex: newIndex
-      });
+      // this.socket.emit('answered', {
+      //   message: this.state.currentQuestionIndex
+      // });
 
-      this.socket.emit('answered', {
-        message: this.state.currentQuestionIndex
-      });
 
     }
 
@@ -53,7 +49,7 @@ export default class Play extends React.Component {
         return(
             <View style={styles.container}>
     			    <Text style={styles.text}>
-    			       Hello
+    			        {this.props.questionIndex} : {this.props.question.data[this.props.questionIndex].question}
     			    </Text>
               <Button onPress={this.clickedOption.bind(this)}>JC Daniel</Button>
               <Button onPress={this.clickedOption.bind(this)}>Hisham</Button>
@@ -76,3 +72,13 @@ const styles = StyleSheet.create({
     fontSize: 25
   }
 });
+
+
+const mapStateToProps = state => {
+  return {
+    question: state.questions.question,
+    questionIndex: state.questions.questionIndex
+  };
+};
+
+export default connect(mapStateToProps, actions)(Play);

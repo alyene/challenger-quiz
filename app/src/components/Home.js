@@ -14,8 +14,8 @@ export default class Home extends React.Component {
 			    <Text style={styles.text}>
 			        Welcome to Challenger
 			    </Text>
-			    
-			 </View> 
+
+			 </View>
         );
     }
 }
