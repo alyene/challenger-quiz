@@ -3,6 +3,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { connect } from 'react-redux';
 import * as actions from '../actions/';
 import SocketIOClient from 'socket.io-client';
+import { environment } from '../config/environment';
 
 class Playnow extends React.Component {
 
@@ -11,7 +12,7 @@ class Playnow extends React.Component {
     constructor(props) {
         super(props);
         const { navigate } = this.props.navigation;
-        this.socket = SocketIOClient('http://192.168.225.37:8000');
+        this.socket = SocketIOClient(environment.backendUrl);
         this.socket.emit('hereisthedata', { userid:1, subjectid:2 });
         this.socket.on('questions', (Questiondata) => {
           // this.setState({gameinitiated: true, questions: Questiondata});
@@ -23,7 +24,9 @@ class Playnow extends React.Component {
   render() {
     return (
       <View style={styles.container}>
-          { (this.props.question.data > 0) ? <Text style={styles.text}> Starting your game !  </Text> : <Text style={styles.text}> Loading your opponent !  </Text>
+          { (this.props.question.data > 0) ? 
+            <Text style={styles.text}>Starting your game!</Text> : 
+            <Text style={styles.text}> Loading your opponent!</Text>
           }
       </View>
     );

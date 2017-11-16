@@ -3,6 +3,7 @@ import { Text, View, StyleSheet, TouchableHighlight } from 'react-native';
 import { Header, Button, Spinner } from './common';
 import { connect } from 'react-redux';
 import * as actions from '../actions/';
+import { environment } from '../config/environment';
 
 import { Otp } from './otp.js';
 import axios from 'axios';
@@ -15,8 +16,7 @@ class Play extends React.Component {
 
     constructor(props) {
       super(props);
-      this.socket = SocketIOClient('http://192.168.225.37:8000');
-
+      this.socket = SocketIOClient(environment.backendUrl);
     }
 
     componentWillMount(){
@@ -30,17 +30,18 @@ class Play extends React.Component {
 
     clickedOption() {
       const { navigate } = this.props.navigation;
-      console.log('current index: ',this.props.questionIndex );
-      if( this.props.questionIndex  > 0) {
+      console.log('current index: ',this.props.questionIndex);
+      
+      if(this.props.questionIndex > 0) {
         console.log('Game Finished, time to navigate.');
         navigate('Result');
-      }else {
+      } else {
           this.props.question_index(this.props.questionIndex + 1);
       }
+
       // this.socket.emit('answered', {
       //   message: this.state.currentQuestionIndex
       // });
-
 
     }
 
