@@ -14,7 +14,7 @@ export default class Home extends React.Component {
 			    <Text style={styles.text}>
 			        Welcome to Challenger
 			    </Text>
-
+                <Button onPress={ () => {navigate('Leaderboard'); console.log("Navigate Please")}}>Leaderboard</Button>
 			 </View>
         );
     }

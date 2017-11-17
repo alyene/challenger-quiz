@@ -10,13 +10,15 @@ import Otp from './src/components/otp.js';
 import Playnow from './src/components/playLoading.js';
 import Play from './src/components/play.js';
 import Result from './src/components/result.js';
+import Leaderboard from './src/components/Leaderboard';
 
 const AppNavigator = StackNavigator({
   Home: { screen: Home},
   Otp: { screen: Otp },
   PlayLoading: { screen: Playnow },
   Play: { screen: Play},
-  Result: { screen: Result }
+  Result: { screen: Result },
+  Leaderboard: { screen: Leaderboard }
 },{
   initialRouteName: "Home",
   headerMode: "none",
