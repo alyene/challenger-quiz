@@ -111,19 +111,28 @@ socket.on('opponentanswered', function(data){
 
 // HELPER FUNCTIONS
 function setQuestionAndTimer() {
+    
+    console.log(info.data.length);
+    console.log(questionIndex);
 
-    questionTag.innerHTML = `${info.data[questionIndex].question}`;
-    button1.innerHTML = `${info.data[questionIndex].option1}`;
-    button2.innerHTML = `${info.data[questionIndex].option2}`;
-    button3.innerHTML = `${info.data[questionIndex].option3}`;
-    button4.innerHTML = `${info.data[questionIndex].option4}`;
-
-    // totalTimer = setTimeout(function(){
-    //     console.log("10 Seconds Over");
-    //     socket.emit('submitanswer', { questionNumber: questionIndex, score: 0, status: false, roomname: info.quizData.roomname });
-    // }, 10000);
-
-    myScore.innerHTML = `My Score : ${hereScore}`
-    hisScore.innerHTML = `His Score : ${thereScore}`
+    if(questionIndex < info.data.length) {
+        questionTag.innerHTML = `${info.data[questionIndex].question}`;
+        button1.innerHTML = `${info.data[questionIndex].option1}`;
+        button2.innerHTML = `${info.data[questionIndex].option2}`;
+        button3.innerHTML = `${info.data[questionIndex].option3}`;
+        button4.innerHTML = `${info.data[questionIndex].option4}`;
+        // totalTimer = setTimeout(function(){
+        //     console.log("10 Seconds Over");
+        //     socket.emit('submitanswer', { questionNumber: questionIndex, score: 0, status: false, roomname: info.quizData.roomname });
+        // }, 10000);
+        myScore.innerHTML = `My Score : ${hereScore}`
+        hisScore.innerHTML = `His Score : ${thereScore}`
+    } else {
+        questionTag.innerHTML = `Quiz Complete.`;
+        button1.style.display = 'none';
+        button2.style.display = 'none';
+        button3.style.display = 'none';
+        button4.style.display = 'none';
+    }
 
 }
