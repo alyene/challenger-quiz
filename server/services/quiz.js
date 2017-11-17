@@ -77,7 +77,7 @@ module.exports = function(app, pool, server) {
         //When a user clicks an option, broadcast message to other user in the same room.
         socket.on('submitanswer', function(data){
             socket.broadcast.to(data.roomname).emit('opponentanswered', 
-            { questionNumber: data.questionNumber, timetaken: data.timetaken, status: data.status});
+            { questionNumber: data.questionNumber, score: data.score, status: data.status});
         });
 
     });
