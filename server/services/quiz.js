@@ -2,23 +2,18 @@ module.exports = function(app, pool, server) {
 
     const uniqid = require('uniqid');
     const socketio = require('socket.io');
+    const websocket = socketio(server); //Initiate Socket
 
-    var websocket = socketio(server);
 
-
+    // ------------- Handling socket events starts here ---------------
     websocket.on('connection', (socket) => {
 
-        socket.on('submitanswer', function(data){
-            socket.broadcast.emit('opponentanswered', { score: 20, status: false });
-        });
-
-        console.log(socket.adapter.rooms);
-
-        //Connection establised. Get data now
+        //Connection establised. Asking for data from client.
         websocket.to(socket.id).emit('datatoserver');
         
+        // Now we have the data, work with it
         socket.on('hereisthedata', function(data){
-            // Now we have the data, work with it
+            
             pool.getConnection(function(err, con){
                 if(err) {
                     console.log(err)
@@ -50,9 +45,9 @@ module.exports = function(app, pool, server) {
                                         });
                                     }
                                 });
-                                    
 
                             } else {
+
                                 console.log("Empty Database, create new game and wait");
                                 
                                 gameroom = uniqid();
@@ -78,8 +73,14 @@ module.exports = function(app, pool, server) {
                 }
             });
         });
-    });
 
+        //When a user clicks an option, broadcast message to other user in the same room.
+        socket.on('submitanswer', function(data){
+            socket.broadcast.to(data.roomname).emit('opponentanswered', 
+            { questionNumber: data.questionNumber, timetaken: data.timetaken, status: data.status});
+        });
+
+    });
 
 
     app.post('/submitquiz', function(req,res){
