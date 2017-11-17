@@ -149,12 +149,34 @@ module.exports = function(app, pool, server) {
                             });
                         },
                     ], function(err, asyncResponse){
-                        console.log("Shit Happens");
                         res.json({status: 200, message: "Update players score"});
                     });
                 }
             });
         }
     });
+
+
+    app.post('/leaderboard', function(req, res){
+
+        if(req.body.subjectwiseboard) {
+            query = `SELECT id, name, ${req.body.subjectwiseboard} AS total FROM users, score WHERE users.id = score.userid ORDER BY total DESC LIMIT ${req.body.limit || 10}`;
+        } else {
+            query = `SELECT id, name, mathematics + english + general + mental + malayalam AS total FROM users, score WHERE users.id = score.userid ORDER BY total DESC LIMIT ${req.body.limit || 10}`;
+        }
+
+        pool.getConnection(function(err, con){
+            con.query(query,
+                function(err, leaderboard){
+                    if(err) {
+                        console.log(err)
+                    } else {
+                        res.json({ data: leaderboard });
+                    }
+                }
+            );
+        });
+    });
+
 
 }// End Module Exports
