@@ -22,7 +22,7 @@ hisScore.innerHTML = `${thereScore}`
 var totalTimer;
 
 socket.on('datatoserver', function() {
-    socket.emit('hereisthedata', {userid:1, subjectid:2});
+    socket.emit('hereisthedata', {userid:1, subjectid:2, userName: "Hisham Mubarak"});
 });
 
 socket.on('gamecreatedpleasewait', function(){
@@ -35,8 +35,12 @@ socket.on('questions', function(data){
     setQuestionAndTimer();
 });
 
+socket.on('opponentdisconnected', function(){
+    console.log("Opponent Disconnected");
+});
+
 button1.addEventListener('click', function() {
-    clearTimeout(totalTimer);
+    window.clearTimeout(totalTimer);
     
     if(info.data[questionIndex].answer === 1) {
         hereScore = hereScore + 10;
@@ -60,7 +64,7 @@ button2.addEventListener('click', function() {
         submitScore = 0;
     }
 
-    clearTimeout(totalTimer);
+    window.clearTimeout(this.totalTimer);
     socket.emit('submitanswer', 
         { questionNumber: questionIndex, score: submitScore, status: info.data[questionIndex].answer === 2, roomname: info.quizData.roomname });
     questionIndex = questionIndex + 1;
@@ -76,7 +80,7 @@ button3.addEventListener('click', function() {
         submitScore = 0;
     }
 
-    clearTimeout(totalTimer);
+    window.clearTimeout(totalTimer);
     socket.emit('submitanswer', 
         { questionNumber: questionIndex, score: submitScore, status: info.data[questionIndex].answer === 3, roomname: info.quizData.roomname });
     questionIndex = questionIndex + 1;
@@ -92,7 +96,7 @@ button4.addEventListener('click', function() {
         submitScore = 0;
     }
 
-    clearTimeout(totalTimer);
+    window.clearTimeout(totalTimer);
     socket.emit('submitanswer', 
         { questionNumber: questionIndex, score: submitScore, status: info.data[questionIndex].answer === 4, roomname: info.quizData.roomname });
     questionIndex = questionIndex + 1;
@@ -102,29 +106,28 @@ button4.addEventListener('click', function() {
 socket.on('opponentanswered', function(data){
     
     console.log(data);
-
     questionIndex = questionIndex + 1;
     thereScore = thereScore + data.score;
     setQuestionAndTimer();
+
 });
 
 
 // HELPER FUNCTIONS
 function setQuestionAndTimer() {
     
-    console.log(info.data.length);
-    console.log(questionIndex);
-
     if(questionIndex < info.data.length) {
         questionTag.innerHTML = `${info.data[questionIndex].question}`;
         button1.innerHTML = `${info.data[questionIndex].option1}`;
         button2.innerHTML = `${info.data[questionIndex].option2}`;
         button3.innerHTML = `${info.data[questionIndex].option3}`;
         button4.innerHTML = `${info.data[questionIndex].option4}`;
-        // totalTimer = setTimeout(function(){
-        //     console.log("10 Seconds Over");
-        //     socket.emit('submitanswer', { questionNumber: questionIndex, score: 0, status: false, roomname: info.quizData.roomname });
-        // }, 10000);
+
+        this.totalTimer = window.setTimeout(function(){
+            console.log("10 Seconds Over, Submit False with 0 as score", this.questionIndex);
+            socket.emit('submitanswer', { questionNumber: questionIndex, score: 0, status: false, roomname: info.quizData.roomname });
+        }, 10000);
+
         myScore.innerHTML = `My Score : ${hereScore}`
         hisScore.innerHTML = `His Score : ${thereScore}`
     } else {

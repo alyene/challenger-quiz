@@ -1,5 +1,6 @@
 module.exports = function(app, pool, server) {
 
+    const async = require("async");
     const uniqid = require('uniqid');
     const socketio = require('socket.io');
     const websocket = socketio(server); //Initiate Socket
@@ -27,7 +28,7 @@ module.exports = function(app, pool, server) {
 
                             if(result.length > 0) {
 
-                                console.log("Found player, setup and begin game");
+                                console.log("Found  player, setup and begin game");
                                 socket.join(result[0].roomname);
                                 getFiveQuery = 'SELECT * FROM questions WHERE subjectid='+ data.subjectid +' ORDER BY RAND() LIMIT 5';
                                 
@@ -40,6 +41,9 @@ module.exports = function(app, pool, server) {
                                             if(err) {
                                                 console.log(err)
                                             } else {
+                                                result[0].twoid = data.userid;
+                                                result[0].twoname = data.userName;
+                                                result[0].twosocket = socket.id;
                                                 websocket.to(result[0].roomname).emit('questions', { quizData: result[0], data: fiveQuestions });
                                             }
                                         });
@@ -56,6 +60,7 @@ module.exports = function(app, pool, server) {
                                 insertData = {
                                     oneid: data.userid,
                                     onesocket: socket.id,
+                                    onename: data.userName,
                                     subjectid: data.subjectid,
                                     roomname: gameroom,
                                 };
@@ -80,34 +85,102 @@ module.exports = function(app, pool, server) {
             { questionNumber: data.questionNumber, score: data.score, status: data.status});
         });
 
+        socket.on('disconnecting', function(){
+            socket.broadcast.to(socket.rooms[Object.keys(socket.rooms)[1]]).emit('opponentdisconnected');
+        });
+
     });
 
 
     app.post('/submitquiz', function(req,res){
         resultData = req.body;
         
-        if((!(resultData.userid)) || (!(resultData.subjectid)) || (!(resultData.quizscore))) {
+        if((!(resultData.subjectid)) || (!(resultData.playerone)) || (!(resultData.playertwo))) {
             res.json({status:400, message: "Incomplete/Invalid Data" });
         } else {
-            
             pool.getConnection(function(err, con) {
                 if(err) {
                     console.log(err)
                 } else {
-                    queryString = "SELECT 1 FROM score WHERE userid=" + resultData.userid + " ORDER BY userid LIMIT 1"; 
-                    con.query(queryString, function(err, result){
-                        if(err) {
-                            console.log(err)
-                        } else if (results.length > 0) {
-                            console.log(result.length);
-                            res.json({status:200});
-                        } else {
 
+                    var quizSubject;
+                    switch(resultData.subjectid) {
+                        case 1: {
+                          this.quizSubject = 'general';
+                          break;
                         }
+                        case 2: {
+                          this.quizSubject = 'mathematics';
+                          break;
+                        }
+                        case 3: {
+                          this.quizSubject = 'english';
+                          break;
+                        }
+                        case 4: {
+                          this.quizSubject = 'malayalam';
+                          break;
+                        }
+                        case 5: {
+                          this.quizSubject = 'mental';
+                          break;
+                        }
+                    }
+
+                    poneQuery = `INSERT INTO score(userid, ${this.quizSubject}) 
+                                 VALUES (${resultData.playerone.id}, ${resultData.playerone.score}) 
+                                 ON DUPLICATE KEY UPDATE ${this.quizSubject} = ${this.quizSubject} + ${resultData.playerone.score}`;
+                                 
+                    ptwoQuery = `INSERT INTO score(userid, ${this.quizSubject}) 
+                                 VALUES (${resultData.playertwo.id}, ${resultData.playertwo.score}) 
+                                 ON DUPLICATE KEY UPDATE ${this.quizSubject} = ${this.quizSubject} + ${resultData.playertwo.score}`;
+                    
+                    async.parallel([
+                        function(callback){
+                            con.query(poneQuery, function(err, result){
+                                if(err) {
+                                    console.log(err)
+                                }
+                                callback();
+                            });
+                        },
+                        function(callback){
+                            con.query(ptwoQuery, function(err, result){
+                                if(err) {
+                                    console.log(err)
+                                }
+                                callback();
+                            });
+                        },
+                    ], function(err, asyncResponse){
+                        res.json({status: 200, message: "Update players score"});
                     });
                 }
             });
         }
     });
+
+
+    app.post('/leaderboard', function(req, res){
+
+        if(req.body.subjectwiseboard) {
+            query = `SELECT id, name, ${req.body.subjectwiseboard} AS total FROM users, score WHERE users.id = score.userid ORDER BY total DESC LIMIT ${req.body.limit || 10}`;
+        } else {
+            query = `SELECT id, name, mathematics + english + general + mental + malayalam AS total FROM users, score WHERE users.id = score.userid ORDER BY total DESC LIMIT ${req.body.limit || 10}`;
+        }
+
+        pool.getConnection(function(err, con){
+            con.query(query,
+                function(err, leaderboard){
+                    if(err) {
+                        console.log(err)
+                    } else {
+                        res.json({ data: leaderboard });
+                    }
+                }
+            );
+        });
+    });
+
 
 }// End Module Exports
