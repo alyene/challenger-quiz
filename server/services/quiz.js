@@ -28,7 +28,7 @@ module.exports = function(app, pool, server) {
 
                             if(result.length > 0) {
 
-                                console.log("Found player, setup and begin game");
+                                console.log("Found  player, setup and begin game");
                                 socket.join(result[0].roomname);
                                 getFiveQuery = 'SELECT * FROM questions WHERE subjectid='+ data.subjectid +' ORDER BY RAND() LIMIT 5';
                                 
@@ -41,6 +41,9 @@ module.exports = function(app, pool, server) {
                                             if(err) {
                                                 console.log(err)
                                             } else {
+                                                result[0].twoid = data.userid;
+                                                result[0].twoname = data.userName;
+                                                result[0].twosocket = socket.id;
                                                 websocket.to(result[0].roomname).emit('questions', { quizData: result[0], data: fiveQuestions });
                                             }
                                         });
@@ -57,6 +60,7 @@ module.exports = function(app, pool, server) {
                                 insertData = {
                                     oneid: data.userid,
                                     onesocket: socket.id,
+                                    onename: data.userName,
                                     subjectid: data.subjectid,
                                     roomname: gameroom,
                                 };

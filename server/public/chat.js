@@ -22,7 +22,7 @@ hisScore.innerHTML = `${thereScore}`
 var totalTimer;
 
 socket.on('datatoserver', function() {
-    socket.emit('hereisthedata', {userid:1, subjectid:2});
+    socket.emit('hereisthedata', {userid:1, subjectid:2, userName: "Hisham Mubarak"});
 });
 
 socket.on('gamecreatedpleasewait', function(){
