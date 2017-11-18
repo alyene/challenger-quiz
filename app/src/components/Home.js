@@ -1,7 +1,6 @@
 import React from 'react';
 import { Text, View, StyleSheet,  TouchableHighlight } from 'react-native';
 import { Header, Button, Spinner } from './common';
-import { Otp } from './otp.js'
 
 export default class Home extends React.Component {
 
@@ -14,7 +13,6 @@ export default class Home extends React.Component {
 			    <Text style={styles.text}>
 			        Welcome to Challenger
 			    </Text>
-
 			 </View>
         );
     }

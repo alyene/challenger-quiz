@@ -1,14 +1,11 @@
 import React from 'react';
 import { Text, View, StyleSheet, TouchableHighlight } from 'react-native';
+
 import { Header, Button, Spinner } from './common';
 import { connect } from 'react-redux';
 import * as actions from '../actions/';
-import { environment } from '../config/environment';
-
-import { Otp } from './otp.js';
-import axios from 'axios';
-
 import SocketIOClient from 'socket.io-client';
+import { environment } from '../config/environment';
 
 class Play extends React.Component {
 
@@ -17,45 +14,40 @@ class Play extends React.Component {
     constructor(props) {
       super(props);
       this.socket = SocketIOClient(environment.backendUrl);
-    }
-
-    componentWillMount(){
-      axios.get('https://reqres.in/api/users/2')
-      .then( res => {
-        // console.log(res.data);
-        this.setState ({questions: res.data});
-        // console.log('State of this app: ', this.state);
+      this.socket.on('opponentanswered', (data) => {
+        // this.setState({gameinitiated: true, questions: Questiondata});
+        console.log('opponent answer data', data);
       });
     }
 
-    clickedOption() {
+
+    clickedOption(index) {
+      clearInterval(this.timer);
+      const roomName = this.props.question.quizData.roomname;
+      console.log('state: ',this.state);
       const { navigate } = this.props.navigation;
-      console.log('current index: ',this.props.questionIndex);
-      
-      if(this.props.questionIndex > 0) {
+      if(this.props.questionIndex > 1) {
         console.log('Game Finished, time to navigate.');
         navigate('Result');
       } else {
+          this.socket.emit('submitanswer', { questionNumber: this.props.questionIndex, score: 0, status: false, roomname: roomName });
           this.props.question_index(this.props.questionIndex + 1);
       }
-
-      // this.socket.emit('answered', {
-      //   message: this.state.currentQuestionIndex
-      // });
-
     }
 
     render() {
         const { navigate } = this.props.navigation;
+        const data = this.props.question.data;
         return(
             <View style={styles.container}>
+
     			    <Text style={styles.text}>
     			        {this.props.questionIndex} : {this.props.question.data[this.props.questionIndex].question}
     			    </Text>
-              <Button onPress={this.clickedOption.bind(this)}>JC Daniel</Button>
-              <Button onPress={this.clickedOption.bind(this)}>Hisham</Button>
-              <Button onPress={this.clickedOption.bind(this)}>Mubarak</Button>
-              <Button onPress={this.clickedOption.bind(this)}>Parengal</Button>
+              <Button onPress={() => this.clickedOption(2)}>{data[this.props.questionIndex].option1}</Button>
+              <Button onPress={() => this.clickedOption(2)}>{data[this.props.questionIndex].option2}</Button>
+              <Button onPress={() => this.clickedOption(3)}>{data[this.props.questionIndex].option3}</Button>
+              <Button onPress={() => this.clickedOption(4)}>{data[this.props.questionIndex].option4}</Button>
 			 </View>
         );
     }
@@ -71,6 +63,10 @@ const styles = StyleSheet.create({
   text : {
   	color: '#fff',
     fontSize: 25
+  },
+  timer: {
+    color: '#fff',
+    fontSize: 50
   }
 });
 
@@ -78,7 +74,9 @@ const styles = StyleSheet.create({
 const mapStateToProps = state => {
   return {
     question: state.questions.question,
-    questionIndex: state.questions.questionIndex
+    questionIndex: state.questions.questionIndex,
+    roomname: state.questions.quizData,
+    submitScore: state.answer.score
   };
 };
 

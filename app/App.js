@@ -6,19 +6,21 @@ import { createStore } from 'redux';
 import reducers from './src/reducers';
 
 import Home from './src/components/Home.js';
-import Otp from './src/components/otp.js';
+import EnterMobile from './src/components/auth/enterMobile.js';
+import Otp from './src/components/auth/otp.js';
 import Playnow from './src/components/playLoading.js';
 import Play from './src/components/play.js';
 import Result from './src/components/result.js';
 
 const AppNavigator = StackNavigator({
+  EnterMobile: { screen: EnterMobile},
   Home: { screen: Home},
   Otp: { screen: Otp },
   PlayLoading: { screen: Playnow },
   Play: { screen: Play},
   Result: { screen: Result }
 },{
-  initialRouteName: "Home",
+  initialRouteName: "EnterMobile",
   headerMode: "none",
   navigationOptions: {
      gesturesEnabled: false,
